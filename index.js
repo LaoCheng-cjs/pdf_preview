@@ -13,7 +13,7 @@ const pdf_viewer = () => import('pdfjs-dist/legacy/web/pdf_viewer')
  *      target: 'dom', 字符串或者dom对象
  *      urlOrFile: 'url', url地址、base64、blob 地址、二进制、file对象
  *      cMapPacked: true 压缩 布尔默认为true
- *      renderer: 'canvas', // 渲染方式，默认canvas。也可以设置svg。注意：svg模式，能复制元素
+ *      renderer: 'canvas', // 渲染方式，默认canvas。也可以设置svg
  *      debug: false; // 开启调试模式，默认不开启false，true为开启
  * }
  * 
@@ -163,7 +163,7 @@ class Pdf {
                 // locale: 'zh-cn',
                 l10n: this.l10n,
                 useOnlyCssZoom: true, // 是否开启缩放功能
-                textLayerMode: 0, // 文本层，在canvas中0禁止，1显示 2
+                textLayerMode: 0, // 文本层，在canvas或者svg中0禁止，1显示 2
                 maxImageSize: this.MAX_IMAGE_SIZE, // 画布大小
                 renderer: options.renderer, // 渲染方式：{string} renderer - 'canvas' or 'svg'. The default is 'canvas'.
             });
