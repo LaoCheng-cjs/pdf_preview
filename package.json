@@ -1,12 +1,10 @@
 {
   "name": "pdf_preview",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": false,
   "main": "src/vue_pdf.vue",
   "scripts": {
-    "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "build:pdf": "webpack"
   },
   "repository": {
     "type": "git",
@@ -23,14 +21,13 @@
     "pdf-preview"
   ],
   "devDependencies": {
-    "@vue/cli-plugin-babel": "~4.5.0",
-    "@vue/cli-plugin-eslint": "~4.5.0",
-    "@vue/cli-service": "~4.5.0",
-    "@vue/compiler-sfc": "^3.0.0",
-    "babel-eslint": "^10.1.0",
-    "eslint": "^6.7.2",
-    "eslint-plugin-vue": "^7.0.0",
-    "pdfjs-dist": "^2.8.335"
+    "file-loader": "^6.2.0",
+    "mini-css-extract-plugin": "^1.6.0",
+    "optimize-css-assets-webpack-plugin": "^6.0.0",
+    "pdfjs-dist": "^2.8.335",
+    "style-loader": "^2.0.0",
+    "webpack": "^5.11.1",
+    "webpack-cli": "^4.3.1"
   },
   "author": "LaoCheng-cjs",
   "license": "MIT",
