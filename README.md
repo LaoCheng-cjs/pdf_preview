@@ -1,5 +1,7 @@
 # pdf_preview
 
+> 目标： http://54.67.70.0:8877/fa2fbf7e8e5276a/web/viewer.html
+
 > 介绍： pdf文件预览器，不支持编辑，基于pdfjs-dist
 
 ### 功能

@@ -8,7 +8,61 @@ const pdf_viewer = () => import('pdfjs-dist/legacy/web/pdf_viewer')
 // console.log(PDFJS());
 /**
  * 为了做到模块化打包，所以需要两个拿到了这两个对象才能访问
+ * 实例化传参
+ *  {
+ *      target: 'dom', 字符串或者dom对象
+ *      urlOrFile: 'url', url地址、base64、blob 地址、二进制、file对象
+ *      cMapPacked: true 压缩 布尔默认为true
+ *      renderer: 'canvas', // 渲染方式，默认canvas。也可以设置svg。注意：svg模式，能复制元素
+ *      debug: false; // 开启调试模式，默认不开启false，true为开启
+ * }
  * 
+ * 方法如下
+ *  打印：判断是否是  window.print();
+ *  
+ *  pagesinit 屏幕初始化
+ *  pagechanging 视图改变
+ *  rotationchanging  // 监听旋转
+ *  eventBus._on("resize", webViewerResize);
+    eventBus._on("hashchange", webViewerHashchange);
+    eventBus._on("beforeprint", _boundEvents.beforePrint);
+    eventBus._on("afterprint", _boundEvents.afterPrint);
+    eventBus._on("pagerendered", webViewerPageRendered);
+    eventBus._on("updateviewarea", webViewerUpdateViewarea);
+    eventBus._on("pagechanging", webViewerPageChanging);
+    eventBus._on("scalechanging", webViewerScaleChanging);
+    eventBus._on("rotationchanging", webViewerRotationChanging);
+    eventBus._on("sidebarviewchanged", webViewerSidebarViewChanged);
+    eventBus._on("pagemode", webViewerPageMode);
+    eventBus._on("namedaction", webViewerNamedAction);
+    eventBus._on("presentationmodechanged", webViewerPresentationModeChanged);
+    eventBus._on("presentationmode", webViewerPresentationMode);
+    eventBus._on("print", webViewerPrint);
+    eventBus._on("download", webViewerDownload);
+    eventBus._on("save", webViewerSave);
+    eventBus._on("firstpage", webViewerFirstPage);
+    eventBus._on("lastpage", webViewerLastPage);
+    eventBus._on("nextpage", webViewerNextPage);
+    eventBus._on("previouspage", webViewerPreviousPage);
+    eventBus._on("zoomin", webViewerZoomIn);
+    eventBus._on("zoomout", webViewerZoomOut);
+    eventBus._on("zoomreset", webViewerZoomReset);
+    eventBus._on("pagenumberchanged", webViewerPageNumberChanged);
+    eventBus._on("scalechanged", webViewerScaleChanged);
+    eventBus._on("rotatecw", webViewerRotateCw);
+    eventBus._on("rotateccw", webViewerRotateCcw);
+    eventBus._on("optionalcontentconfig", webViewerOptionalContentConfig);
+    eventBus._on("switchscrollmode", webViewerSwitchScrollMode);
+    eventBus._on("scrollmodechanged", webViewerScrollModeChanged);
+    eventBus._on("switchspreadmode", webViewerSwitchSpreadMode);
+    eventBus._on("spreadmodechanged", webViewerSpreadModeChanged);
+    eventBus._on("documentproperties", webViewerDocumentProperties);
+    eventBus._on("find", webViewerFind);
+    eventBus._on("findfromurlhash", webViewerFindFromUrlHash);
+    eventBus._on("updatefindmatchescount", webViewerUpdateFindMatchesCount);
+    eventBus._on("updatefindcontrolstate", webViewerUpdateFindControlState);
+  off 也是一样的，进行解除
+ * 使用方法 new pdf().on('rotationchanging', () => {} , 布尔值)
 */
 class Pdf {
     constructor(options) {
@@ -38,6 +92,11 @@ class Pdf {
         if(!options.hasOwnProperty('cMapPacked')) { // 判断是否有这个参数 options
             options.cMapPacked = true;
         }
+        if(!options.hasOwnProperty('debug')) {
+            options.debug = false; // 开启调试模式
+        }
+        options.renderer = ['svg','canvas'].includes(options.renderer) ? options.renderer : 'canvas'
+        this.options = options;
         this.DEFAULT_SCALE_DELTA = 1.1; // 缩放率
         this.MIN_SCALE = 0.25; // 最小缩放
         this.MAX_SCALE = 10.0; // 最大缩放
@@ -57,22 +116,56 @@ class Pdf {
                     this.onProgress(progressData.loaded / progressData.total, progressData)
                 }
             }
-            const {PDFHistory,PDFPageView, EventBus, DefaultAnnotationLayerFactory, DefaultTextLayerFactory, PDFViewer, PDFLinkService, NullL10n} = result[2];
+            const {PDFHistory,PDFPageView,PDFFindController, EventBus, DefaultAnnotationLayerFactory, DefaultTextLayerFactory, PDFViewer, PDFLinkService, NullL10n} = result[2];
             // 启动视图
             const eventBus = new EventBus();
             const linkService = new PDFLinkService({
                 eventBus,
             });
             this.pdfLinkService = linkService;
+            // 启动查找工具
+            const findController = new PDFFindController({
+                linkService: linkService,
+                eventBus,
+            });
+            this.findController = findController;
             this.l10n = NullL10n;
             let pdfViewer = new PDFViewer({
-                container: target,
-                eventBus,
-                linkService,
+                container: target, // dom元素： {HTMLDivElement} container - The container for the viewer element.
+                // viewer: dom // 可选，视图操作 {HTMLDivElement} [viewer] - The viewer element.
+                eventBus, // 监听事件操作 The application event bus.
+                linkService, //{IPDFLinkService} linkService - The navigation/linking service.
+                //downloadManager: 可选 {DownloadManager} [downloadManager] - The download manager
+                // {PDFFindController} [findController] - The find controller
+                //  {PDFScriptingManager} [scriptingManager] - The scripting manager
+                //    {PDFRenderingQueue} [renderingQueue] - The rendering queue object.
+                /**
+                * @property {boolean} [removePageBorders] - Removes the border shadow around
+                *   the pages. The default value is `false`.
+                * @property {number} [textLayerMode] - Controls if the text layer used for
+                *   selection and searching is created, and if the improved text selection
+                *   behaviour is enabled. The constants from {TextLayerMode} should be used.
+                *   The default value is `TextLayerMode.ENABLE`.
+                * @property {string} [imageResourcesPath] - Path for image resources, mainly
+                *   mainly for annotation icons. Include trailing slash.
+                * @property {boolean} [renderInteractiveForms] - Enables rendering of
+                *   interactive form elements. The default value is `true`.
+                * @property {boolean} [enablePrintAutoRotate] - Enables automatic rotation of
+                *   landscape pages upon printing. The default is `false`.
+                * @property {number} [maxCanvasPixels] - The maximum supported canvas size in
+                *   total pixels, i.e. width * height. Use -1 for no limit. The default value
+                *   is 4096 * 4096 (16 mega-pixels).
+                * * @property {boolean} [enableScripting] - Enable embedded script execution
+                *   (also requires {scriptingManager} being set). The default value is `false`.
+                */
+                pdfBug: options.debug,
+                findController,
+                // locale: 'zh-cn',
                 l10n: this.l10n,
                 useOnlyCssZoom: true, // 是否开启缩放功能
-                textLayerMode: 0, // 禁止显示文本，0禁止，1显示
+                textLayerMode: 0, // 文本层，在canvas中0禁止，1显示 2
                 maxImageSize: this.MAX_IMAGE_SIZE, // 画布大小
+                renderer: options.renderer, // 渲染方式：{string} renderer - 'canvas' or 'svg'. The default is 'canvas'.
             });
             this.pdfViewer = pdfViewer
             linkService.setViewer(pdfViewer);
@@ -101,24 +194,15 @@ class Pdf {
             // document.getElementById("pageNumber").value = page;
             // document.getElementById("previous").disabled = page <= 1;
             // document.getElementById("next").disabled = page >= numPages;
+            // 添加事件
+            this.on = (eventName, fn, flag) => {
+                eventBus.on(eventName, fn, flag);
+            }
             // 页面初始化完成
             eventBus.on("pagesinit",  () => {
                 // 设置默认尺寸，进行缩放
-                pdfViewer.currentScaleValue = this.DEFAULT_SCALE_VALUE;
+                this.setPageWidth(this.DEFAULT_SCALE_VALUE)
             });
-            // 视图改变，也就是滑动的时候
-            eventBus.on(
-                "pagechanging", (ev) => {
-                    if(this.pageChanging) {
-                        this.pageChanging(ev)
-                    }
-                },
-                true
-            );
-            // 监听旋转
-            eventBus.on("rotationchanging", function (ev) {
-                console.log(ev);
-            },true);
 
         })
     }
@@ -225,6 +309,29 @@ class Pdf {
         }
         return promise;
     }
+     // 搜索
+    webViewerFind(evt) {
+        /**
+         * 搜索事件名称：
+         *  find 查找
+         *  findentirewordchange 整个单词更改
+         *  findagain 根据搜索定位到下一个搜索到的位置。和findPrevious一起连用
+         *  casesensitivitychang 区分大小写。caseSensitive 连用，默认为 false
+         *  要和下面事件一起连用起来：查找中，查找完成、查找个数、
+         *  eventBus._on("find", webViewerFind);
+            eventBus._on("findfromurlhash", webViewerFindFromUrlHash);
+            eventBus._on("updatefindmatchescount", webViewerUpdateFindMatchesCount);
+            eventBus._on("updatefindcontrolstate", webViewerUpdateFindControlState);
+        */
+        PDFViewerApplication.findController.executeCommand("find" + evt.type, {
+            query: evt.query, // 关键词
+            phraseSearch: evt.phraseSearch, // 短语搜索 true
+            caseSensitive: evt.caseSensitive, // 区分大小写（字词匹配），false 。 true为区别大小写
+            entireWord: evt.entireWord, // 整个单词查找 false不全部，true整个单词搜索
+            highlightAll: evt.highlightAll, // 全部高亮显示，默认给false。true全量
+            findPrevious: evt.findPrevious, // 查找位置，如果是查找上一个(值为true)或者下一个（false）。默认为 undefined
+        });
+    }
     // 获取语言 .then(locale => {console.log(locale) });
     getLanguage () {
         return this.l10n.getLanguage()
@@ -328,6 +435,11 @@ class Pdf {
         newScale = Math.max(this.MIN_SCALE, newScale);
         } while (--ticks && newScale > this.MIN_SCALE);
         this.pdfViewer.currentScaleValue = newScale;
+    }
+    // 设置屏幕宽度
+    setPageWidth(val) {
+        this.DEFAULT_SCALE_VALUE = val
+        this.pdfViewer.currentScaleValue = val;
     }
     // static pdf = null;
     static isDOM(item) {
