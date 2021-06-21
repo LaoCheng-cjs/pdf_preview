@@ -1,6 +1,6 @@
 const PDFJS = () => import('pdfjs-dist/legacy/build/pdf.js');
 // 核心代码
-const workerSrc  = () => import('pdfjs-dist/legacy/build/pdf.worker.entry')
+const workerSrc  =  () => import('pdfjs-dist/legacy/build/pdf.worker.entry')
 
 const pdf_viewer = () => import('pdfjs-dist/legacy/web/pdf_viewer')
 // const {PDFPageView, EventBus, DefaultAnnotationLayerFactory, DefaultTextLayerFactory, PDFViewer, PDFLinkService} = require('pdfjs-dist/legacy/web/pdf_viewer');
@@ -168,6 +168,18 @@ class Pdf {
                 renderer: options.renderer, // 渲染方式：{string} renderer - 'canvas' or 'svg'. The default is 'canvas'.
             });
             this.pdfViewer = pdfViewer
+            // 添加事件
+            this.on = (eventName, fn, flag) => {
+                eventBus.on(eventName, fn, flag);
+            }
+            if(this.load) {
+                this.load()
+            }
+            // 页面初始化完成
+            eventBus.on("pagesinit",  () => {
+                // 设置默认尺寸，进行缩放
+                this.setPageWidth(this.DEFAULT_SCALE_VALUE)
+            });
             linkService.setViewer(pdfViewer);
             let pdfHistory = new PDFHistory({
                 eventBus,
@@ -194,17 +206,13 @@ class Pdf {
             // document.getElementById("pageNumber").value = page;
             // document.getElementById("previous").disabled = page <= 1;
             // document.getElementById("next").disabled = page >= numPages;
-            // 添加事件
-            this.on = (eventName, fn, flag) => {
-                eventBus.on(eventName, fn, flag);
-            }
-            // 页面初始化完成
-            eventBus.on("pagesinit",  () => {
-                // 设置默认尺寸，进行缩放
-                this.setPageWidth(this.DEFAULT_SCALE_VALUE)
-            });
+            
 
         })
+    }
+    // 当前创建生命周期完成
+    onload(fn) {
+        this.load = fn;
     }
     open(newPdf) { // 打开新的pdf
         let params = {url: newPdf}
