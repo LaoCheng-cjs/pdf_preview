@@ -1,8 +1,8 @@
-const PDFJS = () => import('pdfjs-dist/legacy/build/pdf.js');
+const PDFJS = () => import('pdf_preview/legacy/build/pdf.js');
 // 核心代码
-const workerSrc  =  () => import('pdfjs-dist/legacy/build/pdf.worker.entry')
+const workerSrc  =  () => import('pdf_preview/legacy/build/pdf.worker.entry')
 
-const pdf_viewer = () => import('pdfjs-dist/legacy/web/pdf_viewer')
+const pdf_viewer = () => import('pdf_preview/legacy/web/pdf_viewer')
 // const {PDFPageView, EventBus, DefaultAnnotationLayerFactory, DefaultTextLayerFactory, PDFViewer, PDFLinkService} = require('pdfjs-dist/legacy/web/pdf_viewer');
 // import('pdfjs-dist/legacy/web/pdf_viewer.css')
 // console.log(PDFJS());
@@ -213,6 +213,16 @@ class Pdf {
     // 当前创建生命周期完成
     onload(fn) {
         this.load = fn;
+    }
+    get getTitle() {
+        let title = this.pdf.getFilenameFromUrl(this.options.urlOrFile) || this.options.urlOrFile;
+        try {
+            title = decodeURIComponent(title);
+        } catch (e) {
+            // decodeURIComponent may throw URIError,
+            // fall back to using the unprocessed url in that case
+        }
+        return title;
     }
     open(newPdf) { // 打开新的pdf
         let params = {url: newPdf}

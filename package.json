@@ -24,7 +24,6 @@
     "file-loader": "^6.2.0",
     "mini-css-extract-plugin": "^1.6.0",
     "optimize-css-assets-webpack-plugin": "^6.0.0",
-    "pdfjs-dist": "^2.8.335",
     "style-loader": "^2.0.0",
     "webpack": "^5.11.1",
     "webpack-cli": "^4.3.1"
@@ -48,6 +47,14 @@
       "parser": "babel-eslint"
     },
     "rules": {}
+  },
+  "browser": {
+    "canvas": false,
+    "fs": false,
+    "http": false,
+    "https": false,
+    "url": false,
+    "zlib": false
   },
   "browserslist": [
     "> 1%",
