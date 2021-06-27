@@ -64,10 +64,51 @@ const pdf_viewer = () => import('pdf_preview/legacy/web/pdf_viewer')
   off 也是一样的，进行解除
  * 使用方法 new pdf().on('rotationchanging', () => {} , 布尔值)
 */
+
+const KNOWN_VERSIONS = [
+    "1.0",
+    "1.1",
+    "1.2",
+    "1.3",
+    "1.4",
+    "1.5",
+    "1.6",
+    "1.7",
+    "1.8",
+    "1.9",
+    "2.0",
+    "2.1",
+    "2.2",
+    "2.3",
+];
+const KNOWN_GENERATORS = [
+    "acrobat distiller",
+    "acrobat pdfwriter",
+    "adobe livecycle",
+    "adobe pdf library",
+    "adobe photoshop",
+    "ghostscript",
+    "tcpdf",
+    "cairo",
+    "dvipdfm",
+    "dvips",
+    "pdftex",
+    "pdfkit",
+    "itext",
+    "prince",
+    "quarkxpress",
+    "mac os x",
+    "microsoft",
+    "openoffice",
+    "oracle",
+    "luradocument",
+    "pdf-xchange",
+    "antenna house",
+    "aspose.cells",
+    "fpdf",
+];
 class Pdf {
     constructor(options) {
-        console.log(options);
-        console.log(this);
         if(Object.prototype.toString.call(options) != "[object Object]") { // 判断是不是对象
             this.err('实例化传参错误');
             return;
@@ -94,6 +135,9 @@ class Pdf {
         }
         if(!options.hasOwnProperty('debug')) {
             options.debug = false; // 开启调试模式
+        }
+        if(!options.hasOwnProperty('textLayerMode')) {
+            options.textLayerMode = 1
         }
         options.renderer = ['svg','canvas'].includes(options.renderer) ? options.renderer : 'canvas'
         this.options = options;
@@ -130,6 +174,7 @@ class Pdf {
             });
             this.findController = findController;
             this.l10n = NullL10n;
+            // console.log(this.l10n);
             let pdfViewer = new PDFViewer({
                 container: target, // dom元素： {HTMLDivElement} container - The container for the viewer element.
                 // viewer: dom // 可选，视图操作 {HTMLDivElement} [viewer] - The viewer element.
@@ -163,7 +208,7 @@ class Pdf {
                 // locale: 'zh-cn',
                 l10n: this.l10n,
                 useOnlyCssZoom: true, // 是否开启缩放功能
-                textLayerMode: 0, // 文本层，在canvas或者svg中0禁止，1显示 2
+                textLayerMode: options.textLayerMode, // 文本层，在canvas或者svg中0禁止，1显示 2 查找需要
                 maxImageSize: this.MAX_IMAGE_SIZE, // 画布大小
                 renderer: options.renderer, // 渲染方式：{string} renderer - 'canvas' or 'svg'. The default is 'canvas'.
             });
@@ -179,6 +224,7 @@ class Pdf {
             eventBus.on("pagesinit",  () => {
                 // 设置默认尺寸，进行缩放
                 this.setPageWidth(this.DEFAULT_SCALE_VALUE)
+                target.scrollTo(0,0)
             });
             linkService.setViewer(pdfViewer);
             let pdfHistory = new PDFHistory({
@@ -201,13 +247,15 @@ class Pdf {
                 pdfHistory.initialize({ fingerprint: pdfDocument.fingerprint });
                 this.setTitleUsingMetadata(pdfDocument)
             });
+            // 销毁
+            this.destroy = () => {
+                this.pdf.destroy()
+            }
             // const page = evt.pageNumber;
             // const numPages = PDFViewerApplication.pagesCount;
             // document.getElementById("pageNumber").value = page;
             // document.getElementById("previous").disabled = page <= 1;
             // document.getElementById("next").disabled = page >= numPages;
-            
-
         })
     }
     // 当前创建生命周期完成
@@ -385,43 +433,98 @@ class Pdf {
     setTitleUsingMetadata(pdfDocument) {
         const self = this;
         pdfDocument.getMetadata()
-        .then(function (data) {
-            const info = data.info,
-                metadata = data.metadata;
-            self.documentInfo = info;
-            self.metadata = metadata;
+        .then(data => {
+            const { info, metadata, contentDispositionFilename, contentLength } = data;
+            if (pdfDocument !== this.pdfDocument) {
+            return; // The document was closed while the metadata resolved.
+            }
+            this.documentInfo = info;
+            this.metadata = metadata;
+            this._contentDispositionFilename =  contentDispositionFilename;
+            this._contentLength = contentLength; // See `getDownloadInfo`-call above.
+            // this._contentLength ??= contentLength; // See `getDownloadInfo`-call above.
             // Provides some basic debug information
-            console.log(
-                "PDF " +
-                pdfDocument.fingerprint +
-                " [" +
-                info.PDFFormatVersion +
-                " " +
-                (info.Producer || "-").trim() +
-                " / " +
-                (info.Creator || "-").trim() +
-                "]" +
-                " (PDF.js: " +
-                (self.pdf.version || "-") +
-                ")"
-            );
-            let pdfTitle;
-            if (metadata && metadata.has("dc:title")) {
-                const title = metadata.get("dc:title");
-                // Ghostscript sometimes returns 'Untitled', so prevent setting the
-                // title to 'Untitled.
-                if (title !== "Untitled") {
-                pdfTitle = title;
+            // console.log(
+            //     `PDF ${pdfDocument.fingerprint} [${info.PDFFormatVersion} ` +
+            //         `${(info.Producer || "-").trim()} / ${(info.Creator || "-").trim()}] ` +
+            //         `(PDF.js: ${version || "-"})`
+            //     );
+            let pdfTitle = info ? info.Title : '';
+            // let pdfTitle = info?.Title;
+            const metadataTitle = metadata ? metadata.get("dc:title") : '';
+            // const metadataTitle = metadata?.get("dc:title");
+            if (metadataTitle) {
+                // Ghostscript can produce invalid 'dc:title' Metadata entries:
+                //  - The title may be "Untitled" (fixes bug 1031612).
+                //  - The title may contain incorrectly encoded characters, which thus
+                //    looks broken, hence we ignore the Metadata entry when it
+                //    contains characters from the Specials Unicode block
+                //    (fixes bug 1605526).
+                if (
+                    metadataTitle !== "Untitled" &&
+                    !/[\uFFF0-\uFFFF]/g.test(metadataTitle)
+                ) {
+                    pdfTitle = metadataTitle;
                 }
             }
-            if (!pdfTitle && info && info.Title) {
-                pdfTitle = info.Title;
+            if (pdfTitle) {
+                this.setTitle(
+                    `${pdfTitle} - ${contentDispositionFilename || document.title}`
+                );
+            } else if (contentDispositionFilename) {
+                this.setTitle(contentDispositionFilename);
             }
-            self.pdfTitle = pdfTitle
-            // if (pdfTitle) {
-            //     self.setTitle(pdfTitle + " - " + document.title);
-            // }
-        });
+            console.log(info);
+            if ( info.IsXFAPresent && !info.IsAcroFormPresent &&
+                // Note: `isPureXfa === true` implies that `enableXfa = true` was set.
+                !pdfDocument.isPureXfa
+                ) {
+                console.warn("Warning: XFA is not enabled");
+                // this.fallback(UNSUPPORTED_FEATURES.forms);
+            } else if ( (info.IsAcroFormPresent || info.IsXFAPresent) && !this.pdfViewer.renderInteractiveForms ) {
+                console.warn("Warning: Interactive form support is not enabled");
+                // this.fallback(UNSUPPORTED_FEATURES.forms);
+            }
+            if (info.IsSignaturesPresent) {
+                console.warn("Warning: Digital signatures validation is not supported");
+                // this.fallback(UNSUPPORTED_FEATURES.signatures);
+            }
+                // Telemetry labels must be C++ variable friendly.
+            let versionId = "other";
+            if (KNOWN_VERSIONS.includes(info.PDFFormatVersion)) {
+                versionId = `v${info.PDFFormatVersion.replace(".", "_")}`;
+            }
+            let generatorId = "other";
+            if (info.Producer) {
+                const producer = info.Producer.toLowerCase();
+                KNOWN_GENERATORS.some(function (generator) {
+                    if (!producer.includes(generator)) {
+                    return false;
+                    }
+                    generatorId = generator.replace(/[ .-]/g, "_");
+                    return true;
+                });
+            }
+            let formType = null;
+            if (info.IsXFAPresent) {
+                formType = "xfa";
+            } else if (info.IsAcroFormPresent) {
+                formType = "acroform";
+            }
+            console.log({
+                    type: "documentInfo",
+                    version: versionId,
+                    generator: generatorId,
+                    formType,
+                });
+            // this.externalServices.reportTelemetry({
+            //     type: "documentInfo",
+            //     version: versionId,
+            //     generator: generatorId,
+            //     formType,
+            // });
+        })
+        
     }
     get pagesCount() { // 获取总页数
         return this.pdfDocument.numPages;

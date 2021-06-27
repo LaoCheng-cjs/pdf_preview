@@ -4,9 +4,9 @@
     </div>
 </template>
 <script>
-var PDFJS = require('pdfjs-dist/legacy/build/pdf.js');
+var PDFJS = require('../legacy/build/pdf.js');
 // 核心代码
-import workerSrc from 'pdfjs-dist/legacy/build/pdf.worker.entry'
+import workerSrc from '../legacy/build/pdf.worker.entry'
 PDFJS.workerSrc = workerSrc;
 export default {
     props: {
