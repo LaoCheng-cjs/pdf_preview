@@ -133,6 +133,7 @@ export default {
 | cMapUrl | string | （自选）加载需要的cmaps 文件，默认是从 https://cdn.jsdelivr.net/npm/pdfjs-dist@2.8.335/cmaps/加载的，你也可以自定义请求的地址 |
 | cMapPacked | Boolean | （自选）默认为 true |
 | renderer | string | （自选）默认为 canvas 。 你可以选择： 'canvas' 或者 'svg' |
+| textLayerMode | Number | (自选) 默认2。0为禁止复制文本内容。 |
 
 ### onload(function) 方法
 
@@ -225,7 +226,6 @@ pdf.onload(() => {
     })
 })
 ```
-<!-- textLayerMode -->
 
 ## 待支持
 

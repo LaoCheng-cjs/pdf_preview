@@ -137,7 +137,7 @@ class Pdf {
             options.debug = false; // 开启调试模式
         }
         if(!options.hasOwnProperty('textLayerMode')) {
-            options.textLayerMode = 1
+            options.textLayerMode = 2
         }
         options.renderer = ['svg','canvas'].includes(options.renderer) ? options.renderer : 'canvas'
         this.options = options;
