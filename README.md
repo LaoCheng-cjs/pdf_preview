@@ -227,6 +227,70 @@ pdf.onload(() => {
 })
 ```
 
+### 获取pdf名称
+
+> 语法糖：  pdf.getTitle
+
+
+```js
+pdf.onload(() => {
+    console.log(pdf.getTitle)
+})
+```
+
+### 旋转
+
+> 可以旋转 90 度正负或者 180 度正负
+
+```js
+pdf.onload(() => {
+    document.querySelector('#xxx').onclick = function () {
+        // 进行旋转 90度
+        pdf.rotatePages(90)
+    }
+})
+```
+
+### 放大和缩小
+
+**缩小zoomIn**
+
+```js
+pdf.onload(() => {
+    document.querySelector('#xxx').onclick = function () {
+        pdf.zoomIn()
+    }
+})
+```
+
+
+**放大zoomOut**
+
+```js
+pdf.onload(() => {
+    document.querySelector('#xxx').onclick = function () {
+        pdf.zoomOut()
+    }
+})
+```
+
+### 获取设置显示第几页
+
+> 获取当前显示第几页
+
+```js
+pdf.onload(() => {
+    document.querySelector('#xxx').onclick = function () {
+        console.log(pdf.page) // 获取当前pdf展示第几页
+    }
+    document.querySelector('#xxx').onclick = function () {
+        pdf.page = 2; // 设置pdf 显示到第二页
+    }
+})
+```
+
+
+
 ## 待支持
 
 - 查找文本内容
