@@ -1,18 +1,15 @@
 {
-  "name": "pdf_preview",
+  "name": "pdfjs_preview",
   "version": "0.1.0",
   "private": false,
-  "main": "index.js",
+  "main": "./index.js",
   "scripts": {
-    "build:pdf": "webpack"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/LaoCheng-cjs/pdf_preview.git"
   },
   "dependencies": {
-    "core-js": "^3.15.1",
-    "vue": "^3.1.2"
   },
   "keywords": [
     "vue-pdf",
@@ -21,12 +18,6 @@
     "pdf-preview"
   ],
   "devDependencies": {
-    "file-loader": "^6.2.0",
-    "mini-css-extract-plugin": "^1.6.1",
-    "optimize-css-assets-webpack-plugin": "^6.0.1",
-    "style-loader": "^2.0.0",
-    "webpack": "^5.40.0",
-    "webpack-cli": "^4.3.1"
   },
   "author": "LaoCheng-cjs",
   "license": "MIT",
