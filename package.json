@@ -1,6 +1,6 @@
 {
-  "name": "pdfjs_preview",
-  "version": "0.1.0",
+  "name": "jspdf_preview",
+  "version": "0.1.1",
   "private": false,
   "main": "./index.js",
   "scripts": {

@@ -1,4 +1,4 @@
-# pdf_preview
+# jspdf_preview
 
 > 介绍： pdf文件预览器，不支持编辑，基于pdfjs-dist。
 
@@ -7,16 +7,16 @@
 
 
 ```
-npm install pdf_preview
+npm install jspdf_preview
 ```
 
 ## 使用
 
 > 使用情景不一样给出了不一样的用法：
 
-- [简单预览（vue方式）](#简单预览)： 只是渲染出来，不做任何操作。那么就可以考虑下canvas方式渲染。
-- [自定义ui（全部）](#自定义ui)： 如果自定义ui界面的，只要提供方法就好，那么可以考虑直接引入
-- [移动端ui（vue）](#移动端ui)： 如果是移动端且使用好的的ui界面
+- [简单预览（vue方式）](#user-content-简单预览)： 只是渲染出来，不做任何操作。那么就可以考虑下canvas方式渲染。
+- [自定义ui（全部）](#user-content-自定义ui)： 如果自定义ui界面的，只要提供方法就好，那么可以考虑直接引入
+- [移动端ui（vue）](#user-content-移动端ui)： 如果是移动端且使用好的的ui界面
 
 ### 简单预览
 
@@ -32,7 +32,7 @@ npm install pdf_preview
 </template>
 
 <script>
-import pdfBrowserify from 'pdf_preview/src/browserify';
+import pdfBrowserify from 'jspdf_preview/src/browserify';
 export default {
   name: 'Home',
   components: {
@@ -57,8 +57,8 @@ export default {
 #### 二、引入
 
 ```js
-import 'pdf_preview/legacy/web/pdf_viewer.css';
-import  PdfPreview from 'pdf_preview'
+import 'jspdf_preview/legacy/web/pdf_viewer.css';
+import  PdfPreview from 'jspdf_preview'
 ```
 
 #### 三、实例化
@@ -100,7 +100,7 @@ pdf.onload(() => {
 </template>
 
 <script>
-import pdfPreview3 from 'pdf_preview/src/mobile.vue';
+import pdfPreview3 from 'jspdf_preview/src/mobile.vue';
 export default {
   name: 'Home',
   components: {
@@ -130,7 +130,7 @@ export default {
 |  ----  | ----  | ----  |
 |  urlOrFile | string 或者 fileObject | （必须传） |
 | target | string 或者 HTMLElementDom | （必须传） |
-| cMapUrl | string | （自选）加载需要的cmaps 文件，默认是从 https://cdn.jsdelivr.net/npm/pdfjs-dist@2.8.335/cmaps/加载的，你也可以自定义请求的地址 |
+| cMapUrl | string | （自选）加载需要的cmaps 文件，默认是从 https://cdn.jsdelivr.net/npm/pdfjs-dist@2.8.335/cmaps/ 加载的，你也可以自定义请求的地址 |
 | cMapPacked | Boolean | （自选）默认为 true |
 | renderer | string | （自选）默认为 canvas 。 你可以选择： 'canvas' 或者 'svg' |
 | textLayerMode | Number | (自选) 默认2。0为禁止复制文本内容。 |
