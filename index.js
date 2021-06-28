@@ -1,8 +1,8 @@
-const PDFJS = () => import('pdf_preview/legacy/build/pdf.js');
+const PDFJS = () => import('./legacy/build/pdf.js');
 // 核心代码
-const workerSrc  =  () => import('pdf_preview/legacy/build/pdf.worker.entry')
+const workerSrc  =  () => import('./legacy/build/pdf.worker.entry')
 
-const pdf_viewer = () => import('pdf_preview/legacy/web/pdf_viewer')
+const pdf_viewer = () => import('./legacy/web/pdf_viewer')
 // const {PDFPageView, EventBus, DefaultAnnotationLayerFactory, DefaultTextLayerFactory, PDFViewer, PDFLinkService} = require('pdfjs-dist/legacy/web/pdf_viewer');
 // import('pdfjs-dist/legacy/web/pdf_viewer.css')
 // console.log(PDFJS());

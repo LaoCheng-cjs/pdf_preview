@@ -1,6 +1,6 @@
 # jspdf_preview
 
-> 介绍： pdf文件预览器，不支持编辑，基于pdfjs-dist。
+介绍： pdf文件预览器，不支持编辑，基于pdfjs-dist。
 
 
 ### 一、安装
@@ -18,7 +18,7 @@ npm install jspdf_preview
 - [自定义ui（全部）](#user-content-自定义ui)： 如果自定义ui界面的，只要提供方法就好，那么可以考虑直接引入
 - [移动端ui（vue）](#user-content-移动端ui)： 如果是移动端且使用好的的ui界面
 
-### 简单预览
+### 【情景一】简单预览
 
 > 可以根据源码来进行制作
 
@@ -50,7 +50,7 @@ export default {
 ```
 
 
-### 自定义ui
+### 【情景二】自定义ui
 
 > 通过方法或者属性进行。[其他的方法或属性点击我](#pdf 使用说明)
 
@@ -61,10 +61,19 @@ import 'jspdf_preview/legacy/web/pdf_viewer.css';
 import  PdfPreview from 'jspdf_preview'
 ```
 
-#### 三、实例化
+#### 三、实例化与布局
+
+```css
+#viewerContainer {
+  position: absolute;/* 必须给外层绝对定位 */
+}
+```
 
 ```html
-<div id="viewerContainer" style="width: 100%;height: 600px"></div>
+<div id="viewerContainer" style="width: 100%;height: 600px">
+  <!-- 必须有一个div -->
+  <div></div>
+</div>
 ```
 
 ```js
@@ -86,7 +95,7 @@ pdf.onload(() => {
 })
 ```
 
-### 移动端ui
+### 【情景三】移动端ui
 
 > 目前还不完善，请使用上面的实例化对象。但是简单的还是可以使用的
 
@@ -118,7 +127,7 @@ export default {
 <style scoped></style>
 ```
 
-# pdf 使用说明
+# 【情景二】 pdf 使用说明
 
 ### 实例化对象
 
