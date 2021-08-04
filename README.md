@@ -14,9 +14,9 @@ npm install jspdf_preview
 
 > 使用情景不一样给出了不一样的用法：
 
-- [简单预览（vue方式）](#user-content-简单预览)： 只是渲染出来，不做任何操作。那么就可以考虑下canvas方式渲染。
-- [自定义ui（全部）](#user-content-自定义ui)： 如果自定义ui界面的，只要提供方法就好，那么可以考虑直接引入
-- [移动端ui（vue）](#user-content-移动端ui)： 如果是移动端且使用好的的ui界面
+- [简单预览（vue方式）](#user-content-简单预览（vue方式）)： 只是渲染出来，不做任何操作。那么就可以考虑下canvas方式渲染。
+- [自定义ui（全部）](#user-content-自定义ui（全部）)： 如果自定义ui界面的，只要提供方法就好，那么可以考虑直接引入
+- [移动端ui（vue）](#user-content-移动端ui（vue）)： 如果是移动端且使用好的的ui界面
 
 ### 【情景一】简单预览
 

@@ -1,8 +1,8 @@
-const PDFJS = () => import('./legacy/build/pdf.js');
+const PDFJS = () => import('pdf_preview/legacy/build/pdf.js');
 // 核心代码
-const workerSrc  =  () => import('./legacy/build/pdf.worker.entry')
+const workerSrc  =  () => import('pdf_preview/legacy/build/pdf.worker.entry')
 
-const pdf_viewer = () => import('./legacy/web/pdf_viewer')
+const pdf_viewer = () => import('pdf_preview/legacy/web/pdf_viewer')
 // const {PDFPageView, EventBus, DefaultAnnotationLayerFactory, DefaultTextLayerFactory, PDFViewer, PDFLinkService} = require('pdfjs-dist/legacy/web/pdf_viewer');
 // import('pdfjs-dist/legacy/web/pdf_viewer.css')
 // console.log(PDFJS());
@@ -109,6 +109,8 @@ const KNOWN_GENERATORS = [
 ];
 class Pdf {
     constructor(options) {
+        console.log(options);
+        console.log(this);
         if(Object.prototype.toString.call(options) != "[object Object]") { // 判断是不是对象
             this.err('实例化传参错误');
             return;
@@ -126,6 +128,7 @@ class Pdf {
                 return;
             }
         }
+        this.target = target;
         if(!options.urlOrFile) {
             this.err('url或者file文件使用的字段为urlOrFile没有值，请确认地址或者文件');
             return;
@@ -135,9 +138,6 @@ class Pdf {
         }
         if(!options.hasOwnProperty('debug')) {
             options.debug = false; // 开启调试模式
-        }
-        if(!options.hasOwnProperty('textLayerMode')) {
-            options.textLayerMode = 2
         }
         options.renderer = ['svg','canvas'].includes(options.renderer) ? options.renderer : 'canvas'
         this.options = options;
@@ -208,7 +208,7 @@ class Pdf {
                 // locale: 'zh-cn',
                 l10n: this.l10n,
                 useOnlyCssZoom: true, // 是否开启缩放功能
-                textLayerMode: options.textLayerMode, // 文本层，在canvas或者svg中0禁止，1显示 2 查找需要
+                textLayerMode: 0, // 文本层，在canvas或者svg中0禁止，1显示 2
                 maxImageSize: this.MAX_IMAGE_SIZE, // 画布大小
                 renderer: options.renderer, // 渲染方式：{string} renderer - 'canvas' or 'svg'. The default is 'canvas'.
             });
@@ -524,18 +524,23 @@ class Pdf {
             //     formType,
             // });
         })
-        
     }
+    // 
     get pagesCount() { // 获取总页数
         return this.pdfDocument.numPages;
     }
-
+    // 获取
     get page() { // 获取当前页
         return this.pdfViewer.currentPageNumber;
     }
-
+    // 设置
     set page(val) { // 显示第几页
         this.pdfViewer.currentPageNumber = val;
+        setTimeout(() => {
+            // 滚动到响应的位置上
+            const dom = this.target
+            dom.scrollTop = dom.scrollTop - 10
+        }, 0)
     }
     // 缩小
     zoomIn (ticks) {
@@ -562,7 +567,7 @@ class Pdf {
         this.DEFAULT_SCALE_VALUE = val
         this.pdfViewer.currentScaleValue = val;
     }
-    // static pdf = null;
+    // 独有的判断是否是dom对象
     static isDOM(item) {
         // 首先判断是否支持HTMLELement，如果支持，使用HTMLElement，如果不支持，通过判断DOM的特征，如果拥有这些特征说明就是ODM节点，特征使用的越多越准确
         return (typeof HTMLElement === 'function')? (item instanceof HTMLElement) : (item && (typeof item === 'object') && (item.nodeType === 1) && (typeof item.nodeName === 'string'));

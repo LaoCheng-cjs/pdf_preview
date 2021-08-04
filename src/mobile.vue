@@ -2,22 +2,24 @@
     <div class="max-pdf">
         <!-- 导航 -->
         <slot name="head">
-            <div class="nav-wrap">
+            <div class="nav-wrap" @mousemove="parentDefault($event)">
                 <div class="fixed">
                     <!-- 返回 -->
-                    <div class="back"><svg t="1624288134702" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="4089" width="200" height="200"><path d="M748.8 160 390.4 512l358.4 352c19.2 19.2 19.2 57.6 0 76.8-19.2 19.2-57.6 19.2-76.8 0L281.6 556.8c0 0-6.4 0-6.4-6.4C262.4 544 256 524.8 256 512c0-12.8 6.4-32 19.2-38.4 0 0 6.4 0 6.4-6.4l390.4-390.4c19.2-19.2 57.6-19.2 76.8 0C774.4 102.4 774.4 134.4 748.8 160z" p-id="4090"></path></svg></div>
+                    <div class="back" @click="back"><svg t="1624288134702" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="4089" width="200" height="200"><path d="M748.8 160 390.4 512l358.4 352c19.2 19.2 19.2 57.6 0 76.8-19.2 19.2-57.6 19.2-76.8 0L281.6 556.8c0 0-6.4 0-6.4-6.4C262.4 544 256 524.8 256 512c0-12.8 6.4-32 19.2-38.4 0 0 6.4 0 6.4-6.4l390.4-390.4c19.2-19.2 57.6-19.2 76.8 0C774.4 102.4 774.4 134.4 748.8 160z" p-id="4090"></path></svg></div>
                     <div class="content">{{title}}</div>
                     <!-- <div class="more" @click="showMore = true"><svg t="1624287372069" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="3272" width="200" height="200"><path d="M197.844997 512m-74.694189 0a72.993 72.993 0 1 0 149.388379 0 72.993 72.993 0 1 0-149.388379 0Z" p-id="3273"></path><path d="M512 512m-74.694189 0a72.993 72.993 0 1 0 149.388379 0 72.993 72.993 0 1 0-149.388379 0Z" p-id="3274"></path><path d="M826.155003 512m-74.694189 0a72.993 72.993 0 1 0 149.388379 0 72.993 72.993 0 1 0-149.388379 0Z" p-id="3275"></path></svg></div> -->
                 </div>
             </div>
         </slot>
         <div class="viewerContainer-main" ref="viewer">
-            <div id="viewerContainer" :style="{height: h}">
-                <div id="viewer" class="pdfViewer"></div>
+            <div style="position: absolute;top: 0;left:0;width:100%;height:100%">
+                <div id="viewerContainer">
+                    <div id="viewer" class="pdfViewer"></div>
+                </div>
             </div>
         </div>
         <slot>
-            <div class="bar-wrap">
+            <div class="bar-wrap" @mousemove="parentDefault($event)">
                 <div class="fixed"  v-show="isInitPage">
                     <div @click="previous" :class="{ active:page <= 1}">
                         <svg t="1624373561453" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1035" width="200" height="200"><path d="M480.1 291.4c-0.8 0.6-1.7 1.4-2.5 2.1L82.7 654c-21.5 19.6-23 52.9-3.4 74.4 19.6 21.5 52.9 23 74.4 3.4l359.8-328.3 358.8 328.6c21.4 19.6 54.7 18.2 74.4-3.3 19.6-21.4 18.2-54.7-3.3-74.4L549.1 293.3c-19.6-18-49.1-18.3-69-1.9z" fill="" p-id="1036"></path></svg>
@@ -26,7 +28,7 @@
                         <svg t="1624373583085" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1182" width="200" height="200"><path d="M549.1 732.1L943.4 371c21.5-19.7 22.9-53 3.3-74.4-19.7-21.5-53-22.9-74.4-3.3L513.5 621.9 153.7 293.6c-21.5-19.6-54.8-18.1-74.4 3.4-19.6 21.5-18.1 54.8 3.4 74.4l394.9 360.5c0.8 0.7 1.7 1.5 2.5 2.1 19.9 16.4 49.4 16.1 69-1.9z" fill="" p-id="1183"></path></svg>
                     </div>
                     <div class="ipt">
-                        <input type="number" v-model.trim="page" @input="iptChange">/ {{pagesCount}}
+                        <input type="text" v-model.trim="page">/ {{pagesCount}}
                     </div>
                     <div @click="zoomIn">
                         <svg t="1624373737127" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1188" width="200" height="200"><path d="M943.8 892.5l-201.4-201c24.2-29 43.9-61.3 58.7-96.3 20-47.3 30.1-97.6 30.1-149.4s-10.1-102-30.1-149.4c-19.3-45.7-47-86.7-82.1-122-35.2-35.2-76.2-62.9-121.9-82.2-47.3-20-97.5-30.2-149.3-30.2-51.8 0-102 10.2-149.3 30.2-45.7 19.3-86.7 47-121.9 82.2s-62.8 76.3-82.1 122c-20 47.3-30.1 97.6-30.1 149.4s10.1 102 30.1 149.4c19.3 45.7 47 86.7 82.1 122 35.2 35.2 76.2 62.9 121.9 82.2 47.3 20 97.5 30.2 149.3 30.2 51.7 0 102-10.2 149.3-30.2 34.6-14.7 66.6-34.1 95.3-58l201.5 201c6.9 6.9 15.9 10.3 24.9 10.3 9.1 0 18.1-3.5 25-10.4 13.8-13.7 13.8-36.1 0-49.8zM669.7 666.6c-0.4 0.4-0.8 0.7-1.2 1.1-0.3 0.3-0.6 0.6-0.8 0.9-59 58.3-137 90.4-219.9 90.4-83.5 0-162.1-32.6-221.2-91.7-59.1-59.1-91.6-137.8-91.6-221.4s32.5-162.3 91.6-221.4c59.1-59.1 137.6-91.7 221.2-91.7s162.1 32.6 221.2 91.7c59.1 59.1 91.6 137.8 91.6 221.4 0 83.3-32.3 161.6-90.9 220.7z" p-id="1189"></path><path d="M573.7 419H473v-98c0-19.5-13-35.3-32.5-35.3S408 301.5 408 321v98H305.3c-19.5 0-35.3 13-35.3 32.5s15.8 32.5 35.3 32.5H408v105.4c0 19.5 13 35.3 32.5 35.3s32.5-15.8 32.5-35.3V484h100.7c19.5 0 35.3-13 35.3-32.5S593.2 419 573.7 419z" p-id="1190"></path></svg>
@@ -53,7 +55,7 @@
     </div>
 </template>
 <script>
-import '../legacy/web/pdf_viewer.css';
+import 'pdf_preview/legacy/web/pdf_viewer.css';
 import  Pdf from '../index.js'
 export default {
     props: {
@@ -124,14 +126,15 @@ export default {
             }
             this.pdf.page++
         },
-        iptChange() {
-            if(!(/(^[1-9]\D*$)/.test(this.page))){
-                this.page = 1;
-            }else if(this.page > this.pagesCount){
-                this.page = this.pagesCount
-            }
-            this.pdf.page = parseInt(this.page)
-        }
+        // 阻止滑动
+        parentDefault(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        },
+        // 返回顶部
+        back() {
+            this.$emit('back')
+        },
     },
     beforeDestroy() {
         // this.pdfDocument.destroy()
@@ -160,6 +163,9 @@ export default {
     }
     .nav-wrap .content {
         width: 70%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
     }
     .nav-wrap .more {
         width: 15%;
@@ -187,8 +193,7 @@ export default {
     }
     .max-pdf {
         width: 100%;
-            min-height: 80vh;
-        /* height: 100vh; */
+        height: 100vh;
         background-color: #f2f2ef;
         display: flex;
         flex-direction: column;
@@ -196,7 +201,7 @@ export default {
     #viewerContainer {
         width: 100%;
         height: 100%;
-        position: fixed;
+        position: absolute;
         overflow: auto;
     }
     #viewerContainer /deep/ .page {
@@ -270,7 +275,6 @@ export default {
         width: 60%;
         height: 100%;
         background-color: #fff;
-        position: fixed;
         z-index: 23;
         top: 0;
         right: 0;
@@ -279,7 +283,6 @@ export default {
     .mask-wrap {
         width: 100%;
         height: 100%;
-        position: fixed;
         background: rgba(0,0,0,.75);
         top: 0;
         left: 0;
@@ -288,7 +291,6 @@ export default {
     .fixed {
         width: 100%;
         height: 45px;
-        position: fixed;
         display: flex;
     }
 </style>
