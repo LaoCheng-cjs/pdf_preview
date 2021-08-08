@@ -24,7 +24,7 @@
   "bugs": {
     "url": "https://github.com/LaoCheng-cjs/pdf_preview/issues"
   },
-  "homepage": "https://pdf.lolku.cn",
+  "homepage": "https://lolku.cn/doc/pdf",
   "eslintConfig": {
     "root": true,
     "env": {
